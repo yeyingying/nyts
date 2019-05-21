@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="utf-8">
+   <title>New York Times Search</title>
+   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+      integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+   <style>
+      body {
+         font-family: Arial, Helvetica, sans-serif;
+      }
+
+
+      .top {
+         height: 8em;
+         background-color: #20325A;
+         color: white;
+         font-family: Arial, Helvetica, sans-serif;
+         margin: 2em;
+         padding: 1em;
+         font-weight: bolder;
+         text-align: center;
+         padding-top: 2.5em;
+      }
+
+
+      .card {
+         margin: 2em;
+      }
+
+
+      .articleBox {
+         padding: 1.5em;
+         font-size: 16px;
+         border: solid 0.1px #bebebe;
+      }
+
+      a {
+         color: blue;
+         font-size: 14px;
+      }
+
+      a:hover {
+         text-decoration: underline;
+      }
+
+      a:visited {
+         color: purple;
+      }
+   </style>
+
+
+</head>
+
+<body>
+   <section class="top">
+
+      <header id="header">
+         <h2><i class="far fa-newspaper"></i> New York Times Search</h2>
+      </header>
+
+   </section>
+
+   <div class="card">
+      <div class="card-header">
+         <i class="far fa-newspaper"></i>
+         Search Parameters
+      </div>
+      <div class="card-body">
+         <form>
+            <div class="form-group">
+               <label for="exampleFormControlInput1">Serch Term</label>
+               <input type="text" class="form-control" id="searchInput" placeholder="Search news here!">
+            </div>
+            <div class="form-group">
+               <label for="exampleFormControlSelect1">Number of Records to Retrieve</label>
+               <select class="form-control" id="numArticlesInput">
+                  <option>1</option>
+                  <option>5</option>
+                  <option>10</option>
+                  <option>15</option>
+               </select>
+            </div>
+            <div class="form-group">
+
+               <label for="exampleFormControlInput1">Year Published</label>
+               <input type="text" class="form-control" id="yearInput" placeholder="">
+            </div>
+
+         </form>
+         <button type="button" class="btn btn-light" id="searchButton"><i class="fas fa-search"></i> Search</button>
+         <button type="button" class="btn btn-light"><i class="fas fa-trash-alt"></i> Clear Result</button>
+         <script>
+            $("button").click(function () {
+               $("#articles").empty();
+            });
+
+         </script>
+      </div>
+   </div>
+   <div class="card">
+      <div class="card-header">
+         <i class="far fa-newspaper"></i>
+         Top Articles
+      </div>
+      <div class="card-body" id="articles">
+      </div>
+
+      <script>
+         $("#searchButton").on("click", function () {
+            var queryInput = $("#searchInput").val();//value grabbed from the search term input field
+            var numArticles = $("#numArticlesInput").val(); //Value grabbed from year input field 
+            var yearInput = $("#yearInput").val();
+            console.log(yearInput);
+
+            var APIkey = "QJze3pNieDPEjc5NNNbew49ckTOAW8ie";
+
+            //"&fq=pub_year:(" + yearInput + ")
+
+            if (yearInput !== "") {
+               var queryURL = "https://api.nytimes.com/svc/search/v2/articlesearch.json?q=" + queryInput + "&fq=pub_year:(" + yearInput + ")&api-key=" + APIkey;
+            }
+            else {
+               var queryURL = "https://api.nytimes.com/svc/search/v2/articlesearch.json?q=" + queryInput + "&api-key=" + APIkey;
+            }
+            $.ajax({
+               url: queryURL,
+               method: "GET"
+            }).then(function (response) {
+               //This will give us an array of article objects
+               var articles = response.response.docs;
+               console.log(articles);
+
+               for (var i = 0; i < articles.length && i < numArticles; i++) {
+                  var articleURL = articles[i].web_url;
+                  var headline = articles[i].headline.main;
+                  var pubDate = articles[i].pub_date;
+
+                  var articleDiv = $("<div>");
+                  articleDiv.addClass("articleBox");
+                  articleDiv.append("<p>" + headline + "</p>");
+                  articleDiv.append("<p>" + pubDate + "</p>");
+                  articleDiv.append("<a href='" + articleURL + "'>" + articleURL + "</a>");
+
+                  $("#articles").append(articleDiv);
+
+
+               }
+
+            });
+         })
+
+      </script>
+
+</body>
+
+</html>
